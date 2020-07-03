@@ -4,10 +4,15 @@ export const useSetState = (initialState) => {
   const [state, setState] = useState(initialState);
 
   const setPartialState = (value) => {
-    setState((prevValue) => ({
-      ...prevValue,
-      ...value,
-    }));
+    typeof value === "function"
+      ? setState((prevValue) => ({
+          ...prevValue,
+          ...value(prevValue),
+        }))
+      : setState((prevValue) => ({
+          ...prevValue,
+          ...value,
+        }));
   };
 
   return [state, setPartialState];
