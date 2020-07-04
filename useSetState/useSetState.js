@@ -2,18 +2,19 @@ import { useState } from "react";
 
 export const useSetState = (initialState) => {
   const [state, setState] = useState(initialState);
+  const callbackRef = useRef(null);
 
-  const setPartialState = (value) => {
-    typeof value === "function"
-      ? setState((prevValue) => ({
-          ...prevValue,
-          ...value(prevValue),
-        }))
-      : setState((prevValue) => ({
-          ...prevValue,
-          ...value,
-        }));
+  const setPartialState = (state, callback) => {
+    callbackRef.current = callback;
+    setState(state);
   };
+
+  useEffect(() => {
+    if (callbackRef.current) {
+      callbackRef.current(state);
+      callbackRef.current = null;
+    }
+  }, [state]);
 
   return [state, setPartialState];
 };
